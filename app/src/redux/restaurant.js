@@ -1,19 +1,42 @@
 
 import RestClient from '../utilities/RestClient';
 //Actions 
-const GET_RESTAURANT =GET_RESTAURANT;
+const RESTAURANT_LIST="RESTAURANT_LIST";
+const SEARCH_RESTAURANT ="SEARCH_RESTAURANT";
+export const rstaurant_list =(data)=>({type:RESTAURANT_LIST,data:data});
+export const search_rstaurant =(data)=>({type:SEARCH_RESTAURANT,data:data});
 
-export const get_rstaurant =(data)=>({type: 'GET_RESTAURANT',data:data});
 export const getRestaurant= (params,cb)=>{
  return dispatch => {
 
 
-    RestClient.get('categories',params) 
+    RestClient.get('search',params) 
     .then((result) => {
       if(result){
+        dispatch(rstaurant_list (result.restaurants))
       	 let res = {
             status:true,
-            result: result.categories,
+            result: result.restaurants,
+        }
+        cb(res);
+      }
+      else{
+        cb(false);
+      }
+      })
+      .catch((error) => {
+      });
+  }
+}
+export const searchRestaurantDetail= (params,cb)=>{
+ return dispatch => {
+    RestClient.get('restaurant',params) 
+    .then((result) => {
+      dispatch(search_rstaurant(result))
+      if(result){
+         let res = {
+            status:true,
+            result: result,
         }
         cb(res);
       }
@@ -26,13 +49,16 @@ export const getRestaurant= (params,cb)=>{
   }
 }
 //reducer
-const restaurant= (state = [], action) => {
-  switch (action.type) {
+const initialState =[]
+const restaurant= (state = initialState, action) => {
 
-	case 'GET_RESTAURANT':
-		 return state
+  switch (action.type) {
+    case 'RESTAURANT_LIST':
+     return action.data;
+	case 'SEARCH_RESTAURANT':
+		 return [{restaurant:action.data}]
     default:
-      return state
+      return {initialState};
   }
 }
 
